@@ -1,0 +1,22 @@
+model:
+  vision_backbone: vit_l_16
+  predictor_hidden_size: 1024
+  predictor_layers: 8
+  predictor_heads: 16
+  predictor_ffn_mult: 4
+  predictor_dropout: 0.1
+  query_model_name: meta-llama/Llama-3.2-1B
+  y_encoder_name: google/embeddinggemma-300m
+  max_query_tokens: 512
+  max_target_tokens: 512
+  shared_embed_dim: 1536
+  freeze_x_encoder: true
+  y_encoder_lr_multiplier: 0.05
+
+data:
+  num_frames: 8
+  image_size: 256
+
+runtime:
+  device: cuda
+

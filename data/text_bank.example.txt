@@ -1,0 +1,4 @@
+A person is cooking in a kitchen.
+A person is opening a refrigerator.
+The person pours water into a bowl.
+The room becomes darker.

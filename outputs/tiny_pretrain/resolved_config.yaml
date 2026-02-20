@@ -1,0 +1,39 @@
+model:
+  vision_backbone: toy_cnn
+  predictor_hidden_size: 64
+  predictor_layers: 2
+  predictor_heads: 4
+  predictor_ffn_mult: 2
+  predictor_dropout: 0.0
+  query_model_name: toy
+  y_encoder_name: toy
+  max_query_tokens: 32
+  max_target_tokens: 32
+  shared_embed_dim: 64
+  freeze_x_encoder: false
+  y_encoder_lr_multiplier: 0.05
+data:
+  train_manifests:
+  - data/tiny_pretrain_manifest.jsonl
+  num_frames: 2
+  image_size: 64
+  num_workers: 0
+train:
+  seed: 7
+  device: cpu
+  precision: bf16
+  output_dir: outputs/tiny_pretrain
+  batch_size: 2
+  max_steps: 2
+  gradient_accumulation_steps: 1
+  clip_grad_norm: 1.0
+  log_every: 1
+  save_every: 1
+  learning_rate: 0.001
+  min_lr: 0.0
+  weight_decay: 0.0
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_eps: 1.0e-08
+  scheduler: constant
+  temperature: 0.07

@@ -1,0 +1,2 @@
+{"image":"path/to/image.jpg","query":"Describe the scene.","target":"A person is cooking in a kitchen."}
+{"video":"path/to/video.mp4","query":"What is happening?","target":"A person is opening a refrigerator."}

@@ -1,0 +1,2 @@
+{"image":"path/to/image.jpg","query":"How many cups are on the table?","target":"Two cups are on the table.","candidates":["one","two","three","four"]}
+{"video":"path/to/video.mp4","query":"What is the next action?","target":"The person pours water into a bowl.","candidates":["cut onion","pour water","open door"]}
