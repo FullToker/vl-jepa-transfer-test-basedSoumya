@@ -1,4 +1,4 @@
-# VL-JEPA (Paper-Derived Implementation)
+# VL-JEPA Joint Embedding Predictive Architecture for Vision-language (Paper-Derived Implementation)
 
 This repository contains a full implementation of the architecture described in:
 `VL-JEPA: Joint Embedding Predictive Architecture for Vision-language` (arXiv:2512.10942v2, Feb 2, 2026).
