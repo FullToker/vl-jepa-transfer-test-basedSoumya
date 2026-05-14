@@ -11,8 +11,8 @@ import random
 from pathlib import Path
 from urllib.parse import urlparse
 
-VG_DIR = Path("/home/edisk/Dataset/visual_genome")
-OUT_DIR = Path("/home/edisk/Program/VL-JEPA/data")
+VG_DIR = Path("./data/visual_genome")
+OUT_DIR = Path("./data/visual_genome")
 SEED = 42
 
 SPATIAL_PREDICATES = {

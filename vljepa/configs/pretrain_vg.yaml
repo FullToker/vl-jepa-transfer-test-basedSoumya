@@ -15,7 +15,7 @@ model:
 
 data:
   train_manifests:
-    - /home/edisk/Program/VL-JEPA/data/visual_genome/vg_pretrain.jsonl
+    - ./data/visual_genome/vg_pretrain.jsonl
   num_frames: 1
   image_size: 256
   num_workers: 8
@@ -24,7 +24,7 @@ train:
   seed: 42
   device: cuda
   precision: bf16
-  output_dir: /home/edisk/Program/VL-JEPA/outputs/pretrain_vg
+  output_dir: ./outputs/pretrain_vg
   batch_size: 32
   max_steps: 100000
   gradient_accumulation_steps: 1
