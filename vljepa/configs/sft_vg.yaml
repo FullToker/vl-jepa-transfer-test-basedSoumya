@@ -1,0 +1,41 @@
+model:
+  vision_backbone: vit_l_16
+  predictor_hidden_size: 1024
+  predictor_layers: 8
+  predictor_heads: 16
+  predictor_ffn_mult: 4
+  predictor_dropout: 0.1
+  query_model_name: bert-base-uncased
+  y_encoder_name: bert-base-uncased
+  max_query_tokens: 512
+  max_target_tokens: 512
+  shared_embed_dim: 1536
+  freeze_x_encoder: true
+  y_encoder_lr_multiplier: 0.05
+
+data:
+  train_manifests:
+    - ./data/visual_genome/vg_qa.jsonl
+  num_frames: 1
+  image_size: 224
+  num_workers: 2
+
+train:
+  seed: 42
+  device: cuda
+  precision: bf16
+  output_dir: ./outputs/sft_vg
+  batch_size: 32
+  max_steps: 135000      # ~3 epochs: ceil(1445322/32)=45167 steps/epoch x 3
+  gradient_accumulation_steps: 1
+  clip_grad_norm: 1.0
+  log_every: 20
+  save_every: 1000
+  learning_rate: 5.0e-5
+  min_lr: 1.0e-6
+  weight_decay: 0.01
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_eps: 1.0e-8
+  scheduler: cosine
+  temperature: 0.07
