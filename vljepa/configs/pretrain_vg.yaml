@@ -18,13 +18,13 @@ data:
     - ./data/visual_genome/vg_pretrain.jsonl
   num_frames: 1
   image_size: 224
-  num_workers: 2
+  num_workers: 6
 
 train:
   seed: 42
   device: cuda
   precision: bf16
-  output_dir: ./outputs/pretrain_vg
+  output_dir: /data/vgoutputs/pretrain_vg
   batch_size: 32
   max_steps: 100000
   gradient_accumulation_steps: 1
