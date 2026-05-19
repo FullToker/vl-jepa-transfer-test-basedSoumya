@@ -5,8 +5,8 @@ model:
   predictor_heads: 16
   predictor_ffn_mult: 4
   predictor_dropout: 0.1
-  query_model_name: bert-base-uncased
-  y_encoder_name: bert-base-uncased
+  query_model_name: meta-llama/Llama-3.2-1B
+  y_encoder_name: google/embeddinggemma-300m
   max_query_tokens: 512
   max_target_tokens: 512
   shared_embed_dim: 1536
