@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import torch
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from vljepa.data.dataset import VisionLanguageJsonlDataset, vl_collate
@@ -25,6 +26,8 @@ def main() -> None:
     parser.add_argument("--text-bank", type=str, default=None, help="Optional text bank txt/jsonl for NN decoder")
     parser.add_argument("--mode", type=str, choices=["caption", "discriminative_vqa", "selective"], default="caption")
     parser.add_argument("--num-segments", type=int, default=8)
+    parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--num-workers", type=int, default=4)
     args = parser.parse_args()
 
     cfg = load_yaml(args.config)
@@ -61,14 +64,20 @@ def main() -> None:
             print(json.dumps({"idx": i, "prediction": text}, ensure_ascii=False))
 
     elif args.mode == "discriminative_vqa":
-        # Discriminative VQA chooses among provided candidates by cosine similarity.
-        for i in tqdm(range(len(ds)), desc="discriminative_vqa"):
-            batch = vl_collate([ds[i]])
+        loader = DataLoader(
+            ds, batch_size=args.batch_size, num_workers=args.num_workers,
+            collate_fn=vl_collate, pin_memory=True,
+        )
+        idx = 0
+        for batch in tqdm(loader, desc="discriminative_vqa"):
             if not batch["candidates"][0]:
                 raise ValueError("Sample missing `candidates` for discriminative mode.")
-            pred = model.predict_embedding(batch["frames"].to(device), batch["query"])
-            ans = discriminative_match(model, pred, [batch["candidates"][0]])[0]
-            print(json.dumps({"idx": i, "prediction": ans}, ensure_ascii=False))
+            with torch.no_grad():
+                preds = model.predict_embedding(batch["frames"].to(device), batch["query"])
+            answers = discriminative_match(model, preds, batch["candidates"])
+            for ans in answers:
+                print(json.dumps({"idx": idx, "prediction": ans}, ensure_ascii=False), flush=True)
+                idx += 1
 
     else:
         from vljepa.inference.selective import selective_decode_points
