@@ -24,7 +24,7 @@ train:
   seed: 42
   device: cuda
   precision: bf16
-  output_dir: /data/vgoutputs/pretrain_vg
+  output_dir: outputs/pretrain_vg
   batch_size: 128
   max_steps: 25000
   gradient_accumulation_steps: 1
