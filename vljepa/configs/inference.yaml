@@ -15,7 +15,7 @@ model:
 
 data:
   num_frames: 8
-  image_size: 256
+  image_size: 224
 
 runtime:
   device: cuda
