@@ -18,7 +18,7 @@ data:
     - ./data/visual_genome/vg_pretrain.jsonl
   num_frames: 1
   image_size: 224
-  num_workers: 6
+  num_workers: 16
 
 train:
   seed: 42
