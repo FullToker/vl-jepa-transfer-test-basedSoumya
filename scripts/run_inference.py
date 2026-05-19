@@ -33,7 +33,7 @@ def main() -> None:
     model = build_model(cfg)
     ckpt = torch.load(args.checkpoint, map_location="cpu")
     model.load_state_dict(ckpt["model"], strict=False)
-    model.to(device).eval()
+    model.to(device).float().eval()
 
     ds = VisionLanguageJsonlDataset(
         manifest_path=args.manifest,
