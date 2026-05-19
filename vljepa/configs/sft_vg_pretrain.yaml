@@ -18,7 +18,7 @@ data:
     - ./data/visual_genome/vg_qa.jsonl
   num_frames: 1
   image_size: 224
-  num_workers: 16
+  num_workers: 12
 
 train:
   seed: 42
