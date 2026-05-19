@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import torch
+from tqdm import tqdm
 
 from vljepa.data.dataset import VisionLanguageJsonlDataset, vl_collate
 from vljepa.eval.tasks import discriminative_match
@@ -53,7 +54,7 @@ def main() -> None:
                     text_bank.append(json.loads(line)["text"] if line.startswith("{") else line)
         decoder = NearestNeighborDecoder(model, text_bank)
         decoder.build(device)
-        for i in range(len(ds)):
+        for i in tqdm(range(len(ds)), desc="caption"):
             batch = vl_collate([ds[i]])
             pred = model.predict_embedding(batch["frames"].to(device), batch["query"])
             text = decoder.decode(pred, topk=1)[0]
@@ -61,7 +62,7 @@ def main() -> None:
 
     elif args.mode == "discriminative_vqa":
         # Discriminative VQA chooses among provided candidates by cosine similarity.
-        for i in range(len(ds)):
+        for i in tqdm(range(len(ds)), desc="discriminative_vqa"):
             batch = vl_collate([ds[i]])
             if not batch["candidates"][0]:
                 raise ValueError("Sample missing `candidates` for discriminative mode.")
