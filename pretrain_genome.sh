@@ -26,7 +26,7 @@ echo "==> Using checkpoint: $CKPT"
 # ── Stage 2: Build eval manifest (skip if exists) ─────────────────────────────
 echo "==> [2/3] Building VSI-Bench manifest..."
 if [[ ! -f "$MANIFEST" ]]; then
-    python scripts/make_vsibench_manifest.py \
+    python3 scripts/make_vsibench_manifest.py \
         --vsi-dir "$VSI_DIR" \
         --out "$MANIFEST" \
         --mode mc
@@ -36,7 +36,7 @@ fi
 
 # ── Stage 3: Inference + Accuracy ─────────────────────────────────────────────
 echo "==> [3/3] Running inference..."
-python scripts/run_inference.py \
+python3 scripts/run_inference.py \
     --config vljepa/configs/inference.yaml \
     --checkpoint "$CKPT" \
     --manifest "$MANIFEST" \
