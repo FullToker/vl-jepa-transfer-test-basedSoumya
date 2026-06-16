@@ -111,7 +111,7 @@ def make_manifest(dest: Path, out: Path, mode: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Download VSI-Bench and build manifest")
-    parser.add_argument("--dest", default="/home/edisk/Dataset/VSI-Bench")
+    parser.add_argument("--dest", default="./data/VSI-Bench")
     parser.add_argument("--manifest-out", default="data/vsibench_manifest.jsonl")
     parser.add_argument("--mode", choices=["mc", "open", "all"], default="mc")
     args = parser.parse_args()

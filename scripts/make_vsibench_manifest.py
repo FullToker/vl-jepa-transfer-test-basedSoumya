@@ -8,7 +8,7 @@ from pathlib import Path
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--vsi-dir", default="/home/edisk/Dataset/VSI-Bench")
+    parser.add_argument("--vsi-dir", default="./data/VSI-Bench")
     parser.add_argument("--out", default="data/vsibench_manifest.jsonl")
     parser.add_argument("--mode", choices=["mc", "open", "all"], default="mc",
                         help="mc=multiple-choice only, open=open-ended only, all=both")
