@@ -36,6 +36,7 @@ openEQA/
 
 # Outputs / checkpoints
 outputs/
+ckpts/
 *.pt
 *.ckpt
 
