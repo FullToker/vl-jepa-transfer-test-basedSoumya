@@ -8,8 +8,8 @@ PRETRAIN_OUT="outputs/pretrain_vg"
 MANIFEST="data/vsibench_manifest.jsonl"
 VSI_DIR="./data/VSI-Bench"
 RESULTS="outputs/pretrain_vg/vsibench_results.jsonl"
-BATCH_SIZE=32
-NUM_WORKERS=8
+BATCH_SIZE=128
+NUM_WORKERS=12
 
 # ── Stage 1: Pretrain ─────────────────────────────────────────────────────────
 echo "==> [1/3] Pretraining..."
