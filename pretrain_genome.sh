@@ -13,7 +13,7 @@ NUM_WORKERS=8
 
 # ── Stage 1: Pretrain ─────────────────────────────────────────────────────────
 echo "==> [1/3] Pretraining..."
-python scripts/train_pretrain.py --config "$PRETRAIN_CFG"
+python3 scripts/train_pretrain.py --config "$PRETRAIN_CFG"
 
 # ── Find latest checkpoint ────────────────────────────────────────────────────
 CKPT=$(ls -t "$PRETRAIN_OUT"/step_*.pt 2>/dev/null | head -1)

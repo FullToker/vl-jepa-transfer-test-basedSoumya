@@ -1,6 +1,6 @@
 model:
   vision_backbone: vit_l_16
-  predictor_hidden_size: 1024
+  predictor_hidden_size: 2048
   predictor_layers: 8
   predictor_heads: 16
   predictor_ffn_mult: 4
