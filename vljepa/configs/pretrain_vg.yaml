@@ -29,8 +29,8 @@ train:
   max_steps: 10000
   gradient_accumulation_steps: 1
   clip_grad_norm: 1.0
-  log_every: 200
-  save_every: 5000
+  log_every: 50
+  save_every: 10000
   learning_rate: 1.0e-4
   min_lr: 0.0
   weight_decay: 0.01

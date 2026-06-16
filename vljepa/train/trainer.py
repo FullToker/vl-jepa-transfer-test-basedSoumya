@@ -7,6 +7,7 @@ import platform
 from pathlib import Path
 from typing import Dict, Optional
 
+import mlflow
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -102,6 +103,16 @@ class Trainer:
         step = 0
         running_loss = 0.0
 
+        run_name = Path(self.output_dir).name
+        mlflow.start_run(run_name=run_name)
+        mlflow.log_params({
+            "max_steps": self.max_steps,
+            "grad_accum_steps": self.grad_accum_steps,
+            "clip_grad_norm": self.clip_grad_norm,
+            "temperature": self.temperature,
+            "precision": "bf16" if self.autocast_dtype == torch.bfloat16 else "fp16",
+        })
+
         pbar = tqdm(total=self.max_steps, desc="training")
         while step < self.max_steps:
             for batch in self.train_loader:
@@ -138,13 +149,16 @@ class Trainer:
                 step += 1
                 pbar.update(1)
                 if step % self.log_every == 0:
+                    avg_loss = running_loss / self.log_every
+                    lr = self.optimizer.param_groups[0]["lr"]
                     info: Dict[str, float | int] = {
                         "step": step,
-                        "loss": running_loss / self.log_every,
-                        "lr": self.optimizer.param_groups[0]["lr"],
+                        "loss": avg_loss,
+                        "lr": lr,
                     }
                     with open(self.log_path, "a", encoding="utf-8") as f:
                         f.write(json.dumps(info) + "\n")
+                    mlflow.log_metrics({"loss": avg_loss, "lr": lr}, step=step)
                     running_loss = 0.0
                 if step % self.save_every == 0:
                     self._save_ckpt(step)
@@ -153,3 +167,4 @@ class Trainer:
 
         self._save_ckpt(step)
         pbar.close()
+        mlflow.end_run()

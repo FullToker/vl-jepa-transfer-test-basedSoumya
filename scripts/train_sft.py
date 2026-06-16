@@ -8,6 +8,7 @@ import argparse
 import torch
 
 from vljepa.utils.hf_setup import setup_hf
+from vljepa.utils.mlflow_setup import setup_mlflow
 from vljepa.train.build import build_model, build_optimizer_and_scheduler, build_train_loader
 from vljepa.train.trainer import Trainer
 from vljepa.utils.config import dump_resolved_config, load_yaml, validate_train_config
@@ -16,6 +17,7 @@ from vljepa.utils.seed import set_seed
 
 def main() -> None:
     setup_hf()
+    setup_mlflow()
 
     parser = argparse.ArgumentParser(description="Train VL-JEPA SFT stage")
     parser.add_argument("--config", type=str, default="vljepa/configs/sft.yaml")

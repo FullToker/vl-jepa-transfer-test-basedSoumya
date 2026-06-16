@@ -7,3 +7,4 @@ tqdm>=4.66.0
 scikit-learn>=1.4.0
 pytest>=8.0.0
 decord>=0.6.0
+mlflow>=2.10.0
