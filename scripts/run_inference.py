@@ -57,11 +57,18 @@ def main() -> None:
                     text_bank.append(json.loads(line)["text"] if line.startswith("{") else line)
         decoder = NearestNeighborDecoder(model, text_bank)
         decoder.build(device)
-        for i in tqdm(range(len(ds)), desc="caption"):
-            batch = vl_collate([ds[i]])
-            pred = model.predict_embedding(batch["frames"].to(device), batch["query"])
-            text = decoder.decode(pred, topk=1)[0]
-            print(json.dumps({"idx": i, "prediction": text}, ensure_ascii=False))
+        loader = DataLoader(
+            ds, batch_size=args.batch_size, num_workers=args.num_workers,
+            collate_fn=vl_collate, pin_memory=True,
+        )
+        idx = 0
+        for batch in tqdm(loader, desc="caption"):
+            with torch.no_grad():
+                preds = model.predict_embedding(batch["frames"].to(device), batch["query"])
+            texts = decoder.decode(preds, topk=1)
+            for text in texts:
+                print(json.dumps({"idx": idx, "prediction": text}, ensure_ascii=False), flush=True)
+                idx += 1
 
     elif args.mode == "discriminative_vqa":
         loader = DataLoader(

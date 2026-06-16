@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import torch
+from decord import VideoReader, cpu
 from PIL import Image
 from torch.utils.data import Dataset
-from torchvision.io import read_video
 from torchvision.transforms import v2
 
 
@@ -67,20 +67,18 @@ class VisionLanguageJsonlDataset(Dataset):
         return frame.unsqueeze(0).repeat(self.num_frames, 1, 1, 1)  # [T, 3, H, W]
 
     def _load_video(self, video_path: str) -> torch.Tensor:
-        """Uniformly sample num_frames from a video clip."""
+        """Uniformly sample num_frames from a video clip using seek-based decoding."""
 
-        path = Path(video_path)
-        if not path.exists():
+        if not Path(video_path).exists():
             raise FileNotFoundError(f"Video not found: {video_path}")
-        video, _, _ = read_video(video_path, pts_unit="sec")
-        # read_video returns [T, H, W, C] uint8
-        if video.numel() == 0:
+        vr = VideoReader(video_path, ctx=cpu(0))
+        total = len(vr)
+        if total == 0:
             raise RuntimeError(f"Empty video: {video_path}")
-        total = video.shape[0]
         # Uniform temporal sampling to keep frame selection deterministic.
-        idx = torch.linspace(0, total - 1, steps=self.num_frames).long()
-        frames = video[idx]  # [T, H, W, C]
-        frames = frames.permute(0, 3, 1, 2)  # [T, C, H, W]
+        idx = torch.linspace(0, total - 1, steps=self.num_frames).long().tolist()
+        frames = vr.get_batch(idx).asnumpy()  # [T, H, W, C] uint8, only decodes T frames
+        frames = torch.from_numpy(frames).permute(0, 3, 1, 2)  # [T, C, H, W]
         frames = torch.stack([self.transform(f) for f in frames], dim=0)
         return frames
 
