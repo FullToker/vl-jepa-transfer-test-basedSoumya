@@ -11,8 +11,8 @@ wget -c https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/relati
 wget -c https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/question_answers.json.zip
 
 echo "==> Downloading images (~15GB)..."
-wget -c https://cs.stanford.edu/people/rak248/VG_100K_2/images.zip
-wget -c https://cs.stanford.edu/people/rak248/VG_100K_2/images2.zip
+aria2c -x 16 -s 16 -c -o images.zip  https://cs.stanford.edu/people/rak248/VG_100K_2/images.zip
+aria2c -x 16 -s 16 -c -o images2.zip https://cs.stanford.edu/people/rak248/VG_100K_2/images2.zip
 
 echo "==> Extracting metadata..."
 unzip -o image_data.json.zip       && rm image_data.json.zip
