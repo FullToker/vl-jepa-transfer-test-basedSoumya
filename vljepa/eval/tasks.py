@@ -18,13 +18,22 @@ def discriminative_match(model, pred_emb: torch.Tensor, candidates: Sequence[Seq
     """
 
     device = pred_emb.device
-    outputs = []
     for i, cand in enumerate(candidates):
         if not cand:
             raise ValueError(f"Empty candidate list at index {i}.")
-        c_emb = model.encode_target_text(list(cand), device)
+
+    # Encode all candidates from the entire batch in one y_encoder forward pass.
+    sizes = [len(cand) for cand in candidates]
+    flat_cands = [c for cand in candidates for c in cand]
+    flat_emb = model.encode_target_text(flat_cands, device)  # [sum(sizes), D]
+
+    outputs = []
+    offset = 0
+    for i, size in enumerate(sizes):
+        c_emb = flat_emb[offset : offset + size]  # [n_cand, D]
         sim = F.normalize(pred_emb[i : i + 1], dim=-1) @ F.normalize(c_emb, dim=-1).T
-        outputs.append(cand[int(sim.argmax().item())])
+        outputs.append(candidates[i][int(sim.argmax().item())])
+        offset += size
     return outputs
 
 
