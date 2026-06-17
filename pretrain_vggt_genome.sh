@@ -11,6 +11,16 @@ RESULTS="${PRETRAIN_OUT}/vsibench_results.jsonl"
 BATCH_SIZE=128
 NUM_WORKERS=12
 
+# ── Download VGGT weights if needed ──────────────────────────────────────────
+VGGT_CKPT="ckpts/VGGT-1B/model.pt"
+if [[ ! -f "$VGGT_CKPT" ]]; then
+    echo "==> Downloading VGGT-1B weights..."
+    python3 - <<'PYEOF'
+from huggingface_hub import hf_hub_download
+hf_hub_download(repo_id="facebook/VGGT-1B", filename="model.pt", local_dir="./ckpts/VGGT-1B")
+PYEOF
+fi
+
 # ── Stage 1: Pretrain ─────────────────────────────────────────────────────────
 echo "==> [1/3] Pretraining (VGGT + ViT-L)..."
 python3 scripts/train_pretrain.py --config "$PRETRAIN_CFG"
