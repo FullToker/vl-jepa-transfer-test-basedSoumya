@@ -49,3 +49,10 @@ Thumbs.db
 
 data/visual_genome/
 data/VSI-Bench/
+
+# vggt (vendored, exclude build artifacts and large assets)
+vggt/examples/
+vggt/**/__pycache__/
+vggt/**/*.egg-info/
+vggt/dist/
+vggt/build/
