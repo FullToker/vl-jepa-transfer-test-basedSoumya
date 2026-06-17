@@ -30,6 +30,8 @@ def build_model(cfg: dict) -> VLJEPA:
         shared_embed_dim=m["shared_embed_dim"],
         freeze_x_encoder=m["freeze_x_encoder"],
         y_encoder_lr_multiplier=m["y_encoder_lr_multiplier"],
+        use_vggt=m.get("use_vggt", False),
+        vggt_ckpt=m.get("vggt_ckpt", "./ckpts/VGGT-1B/model.pt"),
     )
     return VLJEPA(model_cfg)
 

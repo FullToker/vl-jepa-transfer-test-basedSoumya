@@ -15,6 +15,8 @@ except Exception:  # pragma: no cover - optional dependency in tiny/offline mode
     AutoModel = None
     AutoTokenizer = None
 
+from vljepa.models.vggt_encoder import FrozenVGGT
+
 # References:
 # - Chen et al., "VL-JEPA: Joint Embedding Predictive Architecture for Vision-language"
 #   arXiv:2512.10942v2, Feb 2, 2026
@@ -41,6 +43,9 @@ class VLJEPAConfig:
     shared_embed_dim: int
     freeze_x_encoder: bool
     y_encoder_lr_multiplier: float
+    # VGGT fusion (last-layer concat)
+    use_vggt: bool = False
+    vggt_ckpt: str = "./ckpts/VGGT-1B/model.pt"
 
 
 class _TokenBatch(dict):
@@ -196,6 +201,67 @@ class VisionEncoder(nn.Module):
         return feat
 
 
+class FusedVisionEncoder(nn.Module):
+    """
+    Torchvision ViT + frozen VGGT last-layer concat encoder.
+
+    Both branches receive the same ImageNet-normalised frames.  VGGT
+    features are mean-pooled over spatial tokens; ViT features are
+    mean-pooled over patch tokens.  The two are concatenated and
+    projected to output_dim.
+
+    Input:  [B, T, C, H, W]  ImageNet-normalised
+    Output: [B, T, output_dim]
+
+    Supported backbones: vit_b_16, vit_l_16, vit_b_16_rand, vit_l_16_rand
+    """
+
+    def __init__(self, backbone: str, output_dim: int, vggt_ckpt: str) -> None:
+        super().__init__()
+        self.backbone_name = backbone
+
+        if backbone in {"vit_b_16", "vit_b_16_rand"}:
+            weights = ViT_B_16_Weights.IMAGENET1K_V1 if backbone == "vit_b_16" else None
+            net = vit_b_16(weights=weights)
+        elif backbone in {"vit_l_16", "vit_l_16_rand"}:
+            weights = ViT_L_16_Weights.IMAGENET1K_V1 if backbone == "vit_l_16" else None
+            net = vit_l_16(weights=weights)
+        else:
+            raise ValueError(
+                f"FusedVisionEncoder supports only torchvision ViTs, got: {backbone}"
+            )
+
+        self._vit_feat_dim: int = net.hidden_dim
+        self.vit = net
+        # Freeze pretrained ViT — only proj is learnable in this encoder
+        for p in self.vit.parameters():
+            p.requires_grad_(False)
+
+        self.vggt = FrozenVGGT(vggt_ckpt)  # always frozen internally
+        self.proj = nn.Linear(self._vit_feat_dim + FrozenVGGT.OUT_DIM, output_dim)
+
+    def _vit_features(self, x: torch.Tensor) -> torch.Tensor:
+        """x: (N, 3, H, W) → (N, vit_feat_dim) mean-pooled patch tokens."""
+        n = x.shape[0]
+        x = self.vit._process_input(x)
+        cls = self.vit.class_token.expand(n, -1, -1)
+        x = torch.cat([cls, x], dim=1)
+        x = self.vit.encoder(x)
+        return x[:, 1:, :].mean(dim=1)
+
+    def forward(self, frames: torch.Tensor) -> torch.Tensor:
+        """frames: [B, T, C, H, W] → [B, T, output_dim]"""
+        B, T, C, H, W = frames.shape
+
+        vit_feat = self._vit_features(frames.view(B * T, C, H, W))
+        vit_feat = vit_feat.view(B, T, self._vit_feat_dim)
+
+        vggt_feat = self.vggt(frames)  # (B, T, 2048)
+
+        fused = torch.cat([vit_feat, vggt_feat], dim=-1)
+        return self.proj(fused)  # (B, T, output_dim)
+
+
 class VLJEPA(nn.Module):
     """
     VL-JEPA core model.
@@ -215,10 +281,17 @@ class VLJEPA(nn.Module):
             raise ValueError("`predictor_hidden_size` must be > 0.")
 
         # Paper Sec. 3.1: frozen visual encoder by default.
-        self.x_encoder = VisionEncoder(cfg.vision_backbone, h)
+        if cfg.use_vggt:
+            self.x_encoder = FusedVisionEncoder(cfg.vision_backbone, h, cfg.vggt_ckpt)
+        else:
+            self.x_encoder = VisionEncoder(cfg.vision_backbone, h)
         if cfg.freeze_x_encoder:
             for p in self.x_encoder.parameters():
                 p.requires_grad = False
+            # FusedVisionEncoder: proj bridges the two frozen backbones and must train
+            if cfg.use_vggt:
+                for p in self.x_encoder.proj.parameters():
+                    p.requires_grad = True
 
         if cfg.query_model_name == "toy":
             self.query_tokenizer = ToyTokenizer()
