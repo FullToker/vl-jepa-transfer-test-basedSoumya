@@ -27,8 +27,8 @@ train:
   device: cuda
   precision: bf16
   output_dir: outputs/pretrain_vggt_vg
-  batch_size: 512
-  max_steps: 10000
+  batch_size: 128
+  max_steps: 20000
   gradient_accumulation_steps: 1
   clip_grad_norm: 1.0
   log_every: 50
