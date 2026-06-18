@@ -17,7 +17,6 @@ from vljepa.utils.seed import set_seed
 
 def main() -> None:
     setup_hf()
-    setup_mlflow()
 
     parser = argparse.ArgumentParser(description="Train VL-JEPA pretraining stage")
     parser.add_argument("--config", type=str, default="vljepa/configs/pretrain.yaml")
@@ -25,6 +24,8 @@ def main() -> None:
 
     cfg = load_yaml(args.config)
     validate_train_config(cfg)
+    if cfg.get("mlflow", {}).get("enabled", True):
+        setup_mlflow()
     set_seed(cfg["train"]["seed"], deterministic=True)
     dump_resolved_config(cfg, cfg["train"]["output_dir"])
     device = torch.device(cfg["train"]["device"] if torch.cuda.is_available() else "cpu")
