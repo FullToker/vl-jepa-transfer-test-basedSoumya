@@ -45,7 +45,7 @@ class FrozenVGGT(nn.Module):
             state = state["model"]
         vggt.load_state_dict(state, strict=False)
 
-        self.aggregator = vggt.aggregator
+        self.aggregator = torch.compile(vggt.aggregator)
         for p in self.parameters():
             p.requires_grad_(False)
         self.eval()
