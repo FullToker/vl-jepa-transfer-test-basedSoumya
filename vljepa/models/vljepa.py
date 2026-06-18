@@ -249,6 +249,7 @@ class FusedVisionEncoder(nn.Module):
         x = self.vit.encoder(x)
         return x[:, 1:, :].mean(dim=1)
 
+    @torch.autocast("cuda", dtype=torch.bfloat16)
     def forward(self, frames: torch.Tensor) -> torch.Tensor:
         """frames: [B, T, C, H, W] → [B, T, output_dim]"""
         B, T, C, H, W = frames.shape
@@ -259,7 +260,7 @@ class FusedVisionEncoder(nn.Module):
         vggt_feat = self.vggt(frames)  # (B, T, 2048)
 
         fused = torch.cat([vit_feat, vggt_feat], dim=-1)
-        return self.proj(fused)  # (B, T, output_dim)
+        return self.proj(fused).float()  # (B, T, output_dim)
 
 
 class VLJEPA(nn.Module):

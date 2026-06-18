@@ -59,6 +59,7 @@ class FrozenVGGT(nn.Module):
         return super().train(False)
 
     @torch.no_grad()
+    @torch.autocast("cuda", dtype=torch.bfloat16)
     def forward(self, frames: torch.Tensor) -> torch.Tensor:
         """
         frames : (B, T, 3, H, W)  ImageNet-normalised
