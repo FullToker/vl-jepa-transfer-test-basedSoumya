@@ -24,7 +24,7 @@ data:
   num_workers: 12
 
 mlflow:
-  enabled: false
+  enabled: true
 
 train:
   seed: 42
