@@ -2,6 +2,12 @@
 set -euo pipefail
 export PYTHONPATH="$(cd "$(dirname "$0")" && pwd)"
 
+# Load MLflow credentials if present
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [[ -f "$SCRIPT_DIR/.env/mlflow.env" ]]; then
+    source "$SCRIPT_DIR/.env/mlflow.env"
+fi
+
 # ── Config ────────────────────────────────────────────────────────────────────
 PRETRAIN_CFG="vljepa/configs/pretrain_vggt_vg.yaml"
 PRETRAIN_OUT="outputs/pretrain_vggt_vg"
