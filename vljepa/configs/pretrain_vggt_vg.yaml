@@ -2,6 +2,7 @@ model:
   vision_backbone: vit_l_16
   use_vggt: true
   vggt_ckpt: ./ckpts/VGGT-1B/model.pt
+  vggt_img_size: 224
   predictor_hidden_size: 2048
   predictor_layers: 8
   predictor_heads: 16

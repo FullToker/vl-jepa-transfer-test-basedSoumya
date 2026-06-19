@@ -46,6 +46,7 @@ class VLJEPAConfig:
     # VGGT fusion (last-layer concat)
     use_vggt: bool = False
     vggt_ckpt: str = "./ckpts/VGGT-1B/model.pt"
+    vggt_img_size: int = 518
 
 
 class _TokenBatch(dict):
@@ -216,7 +217,7 @@ class FusedVisionEncoder(nn.Module):
     Supported backbones: vit_b_16, vit_l_16, vit_b_16_rand, vit_l_16_rand
     """
 
-    def __init__(self, backbone: str, output_dim: int, vggt_ckpt: str) -> None:
+    def __init__(self, backbone: str, output_dim: int, vggt_ckpt: str, vggt_img_size: int = 518) -> None:
         super().__init__()
         self.backbone_name = backbone
 
@@ -237,7 +238,7 @@ class FusedVisionEncoder(nn.Module):
         for p in self.vit.parameters():
             p.requires_grad_(False)
 
-        self.vggt = FrozenVGGT(vggt_ckpt)  # always frozen internally
+        self.vggt = FrozenVGGT(vggt_ckpt, img_size=vggt_img_size)  # always frozen internally
         self.proj = nn.Linear(self._vit_feat_dim + FrozenVGGT.OUT_DIM, output_dim)
 
     def _vit_features(self, x: torch.Tensor) -> torch.Tensor:
@@ -283,7 +284,7 @@ class VLJEPA(nn.Module):
 
         # Paper Sec. 3.1: frozen visual encoder by default.
         if cfg.use_vggt:
-            self.x_encoder = FusedVisionEncoder(cfg.vision_backbone, h, cfg.vggt_ckpt)
+            self.x_encoder = FusedVisionEncoder(cfg.vision_backbone, h, cfg.vggt_ckpt, cfg.vggt_img_size)
         else:
             self.x_encoder = VisionEncoder(cfg.vision_backbone, h)
         if cfg.freeze_x_encoder:

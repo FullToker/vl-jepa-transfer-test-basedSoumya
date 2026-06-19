@@ -28,10 +28,10 @@ class FrozenVGGT(nn.Module):
     the final cached layer (round 23 of 24).
     """
 
-    _VGGT_SIZE = 518
     OUT_DIM = 2048  # 2 × embed_dim (frame_inter ∥ global_inter)
 
-    def __init__(self, ckpt_path: str) -> None:
+    def __init__(self, ckpt_path: str, img_size: int = 518) -> None:
+        self._VGGT_SIZE = img_size
         super().__init__()
 
         vggt = VGGT(

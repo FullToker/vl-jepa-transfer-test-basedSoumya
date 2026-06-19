@@ -32,6 +32,7 @@ def build_model(cfg: dict) -> VLJEPA:
         y_encoder_lr_multiplier=m["y_encoder_lr_multiplier"],
         use_vggt=m.get("use_vggt", False),
         vggt_ckpt=m.get("vggt_ckpt", "./ckpts/VGGT-1B/model.pt"),
+        vggt_img_size=m.get("vggt_img_size", 518),
     )
     return VLJEPA(model_cfg)
 
