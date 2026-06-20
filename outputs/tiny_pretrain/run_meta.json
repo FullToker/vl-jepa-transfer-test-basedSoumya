@@ -1,9 +1,0 @@
-{
-  "framework": "pytorch",
-  "torch_version": "2.10.0+cpu",
-  "cuda_available": false,
-  "cuda_version": null,
-  "device": "cpu",
-  "hostname": "cachyos",
-  "platform": "Linux-6.19.2-2-cachyos-x86_64-with-glibc2.43"
-}
